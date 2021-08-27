@@ -10,10 +10,7 @@ RadioVisibility::RadioVisibility(int radius, QObject *parent) :
 
 }
 
-RadioVisibility::~RadioVisibility()
-{
 
-}
 /**
  * @brief RadioVisibility::drawlines Обновляет вектор объектов, к которым необходимо нарисовать линии связи
  * @param links вектор объектов, к которым рисуются связи
@@ -24,6 +21,7 @@ void RadioVisibility::drawlines(QVector<QGraphicsItem*> links){
         vecLinks.clear();
 
     vecLinks = links;
+
 }
 /**
  * @brief RadioVisibility::type виртуальная функция QGraphicsItem, показывает тип элемента
@@ -63,6 +61,8 @@ void RadioVisibility::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     for(int i=0; i<vecLinks.count();++i){
         painter->drawLine(mapFromScene(this->pos()),
                           mapFromScene(vecLinks.at(i)->pos()));
+
+
     }
 
     Q_UNUSED(option);

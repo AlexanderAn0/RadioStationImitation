@@ -17,7 +17,8 @@ class RadioVisibility : public QObject, public QGraphicsItem
     Q_OBJECT
 public:
     RadioVisibility(int radius, QObject *parent = nullptr);
-    ~RadioVisibility();
+
+
     void drawlines(QVector<QGraphicsItem*> links);
     int type() const;
 
@@ -25,9 +26,11 @@ private:
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
+    /// Радиовидимость станции
     int radioVisRadius;
+    /// объекты к которым необходимо рисовать линии
     QVector <QGraphicsItem *> vecLinks;
+
     enum {
         RS = 65537,
         RV = 65538

@@ -23,6 +23,8 @@ RadioStation::RadioStation(int radius, int num, QObject *parent) :
  * @brief RadioStation::~RadioStation Удаляет созданные объекты
  */
 RadioStation::~RadioStation(){
+
+    delete myRadV;
     actDel->deleteLater();
     menuRadioStation->deleteLater();
 }
@@ -44,7 +46,6 @@ void RadioStation::updateLinks(){
             if(collItems.at(i)->type() == RS)
             {
                 addLink(static_cast<RadioStation*>(collItems.at(i)));
-
             }
         }
     }
@@ -83,6 +84,7 @@ bool RadioStation::linked(RadioStation *RS){
 void RadioStation::removeLink(RadioStation *RS){
     if(links.contains(RS))
     links.removeAll(RS);
+
 }
 
 /**
@@ -115,6 +117,14 @@ RadioVisibility * RadioStation::getRadioVisibility(){
  */
 int RadioStation::type() const {
     return RS;
+}
+/**
+  * @brief RadioStation::contextMenuEvent Вызывает контекстное меню в запрашиваемой точке
+  * @param event событие вызова контекстного меню
+  */
+void RadioStation::contextMenuEvent(QGraphicsSceneContextMenuEvent *event){
+    menuRadioStation->popup(event->screenPos());
+
 }
 
 /**
@@ -163,32 +173,17 @@ void RadioStation::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 }
 
 /**
- * @brief RadioStation::mousePressEvent Действия, при нажатии мышью на объект ЛКМ смена вида курсора
- *                                      ПКМ - открытие контекстного меню
+ * @brief RadioStation::mousePressEvent Действия, при нажатии мышью на объект ЛКМ смена вида курсора                             
  * @param event Что и где на сцене делают мышью
  */
 void RadioStation::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if(event->button()== Qt::LeftButton )
-    {
-        ///!!! при выборе контекстного меню, а после, если необходимо меню закрыть, при нажатии ЛКМ на сцене
-        /// вызывается mouseMoveEvent и перемещает станцию и видимость несинхронно в место нажатия
-        /// добавил собственный вызов mouseMoveEvent, чтобы перемещалось хотябы синхронно
-        mouseMoveEvent(event);
+    {        
         this->setCursor(QCursor(Qt::ClosedHandCursor));
     }
-    else
-    {
-        ///Если вместо этого условия поставить event->ignore(), то бага как коменте сверху не возникает,
-        /// но тогда открывается много контекстных меню и каждое нужно закрывать отдельным щелчком мимо
-        /// не знаю как решить
-      if(event->isAccepted())
-       {
-         menuRadioStation->popup(QCursor::pos());
-       }
-    }
-
 }
+
 /**
  * @brief RadioStation::mouseReleaseEvent Действие при отпускании мыши, смена курсора на стандартный
  * @param event Что и где на сцене делают мышью
@@ -216,6 +211,7 @@ bool RadioStation::stationsAtBoundingRectAngles(RadioStation *RS){
     {
         this->removeLink(RS);
         RS->removeLink(this);
+
         return true;
     }
     return false;
@@ -239,6 +235,7 @@ void RadioStation::addLink(RadioStation *RS){
         else
         {
             RS->drawLink(this);
+
         }
     }
 }
@@ -247,7 +244,7 @@ void RadioStation::addLink(RadioStation *RS){
  * @brief RadioStation::deleteRS Удаляет станцию и радиовидимость
  */
 void RadioStation::deleteRS(){
-    delete  myRadV;
+
     delete this;
 }
 

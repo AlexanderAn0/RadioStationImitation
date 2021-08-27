@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(actNew, &QAction::triggered, this, &MainWindow::on_btnAddStation_clicked);
     /// при изменении на сцене, обновлять связи между станциями
     connect(mainScene, &QGraphicsScene::changed, this, &MainWindow::updateGraphicsItemLinks );
-    connect(ui->interactiveGraphicsWindow, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotCustomMenuRequested(QPoint)));
+
 
 }
 
@@ -32,11 +32,12 @@ MainWindow::~MainWindow()
     delete ui;
 
 }
+
 /**
  * @brief MainWindow::updateGraphicsItemLinks Обновляет вектор связей элементов при каких-либо изменениях на сцене
  */
-void MainWindow::updateGraphicsItemLinks(){
-
+void MainWindow::updateGraphicsItemLinks()
+{
     QList<QGraphicsItem*> sceneItems = mainScene->items();
 
     for (int i=0; i < sceneItems.count(); ++i ) {
@@ -44,15 +45,24 @@ void MainWindow::updateGraphicsItemLinks(){
             static_cast<RadioStation*>(sceneItems.at(i))->updateLinks();
         }
     }
+
 }
 
 /**
- * @brief MainWindow::slotCustomMenuRequested Когда вызвается контектсное меню запоминает точку вызова
- * @param pos место, где вызывается контекстное меню
+ * @brief MainWindow::contextMenuEvent Вызывается при необходимости контекстного меню
+ * @param event событие вызова контекстного меню
  */
-void MainWindow::slotCustomMenuRequested(QPoint pos){
-    lastRightclickPos = pos;
-    menuMW->popup(ui->interactiveGraphicsWindow->mapToGlobal(pos));
+void MainWindow::contextMenuEvent(QContextMenuEvent *event){
+    /// Запоминается точка последнего нажатия ПКМ
+    lastRightclickPos = event->pos();
+    /// Проверяется, если под мышью нет RadioStation, то вызывает собственное меню
+    /// иначе, ивент не используется и передается объекту под мышью и вызывается контекстное меню объекта
+    QGraphicsItem* itemUnderMouse = ui->interactiveGraphicsWindow->itemAt(event->pos());
+    if(itemUnderMouse == nullptr || itemUnderMouse->type() != RadioStation::RS)
+    {
+        menuMW->popup(ui->interactiveGraphicsWindow->mapToGlobal(event->pos()));
+    }
+
 }
 
 /**
@@ -108,17 +118,24 @@ void MainWindow::on_cbxRandomRadius_stateChanged(int presset)
  */
 void MainWindow::on_btnDeleteAllStations_clicked()
 {
+    ///!!! при удалении разом 65+ объектов ошибка сегментации, т.к. у еще не удаленных идет обращение к
+    /// удаленным объектам в RadioVisibility::vecLinks.at(i).pos() или в RadioStation::Links.at(i)
+
     QList<QGraphicsItem*> sceneItems = mainScene->items();
 
     /// находит среди объектов радиостанции и удаляет их, отдельно убирая их радиовидимость из себя
     for (int i=0;i<sceneItems.count() ;++i ) {
-      if(sceneItems.at(i)->type() == RadioStation::RS){
-          sceneItems.removeAll(static_cast<RadioStation*>(sceneItems.at(i))->getRadioVisibility());
-          static_cast<RadioStation*>(sceneItems.at(i))->deleteRS();
-      }
+        {
+            mainScene->removeItem(sceneItems.at(i));
+            if(sceneItems.at(i)->type()== RadioStation::RS){
+                sceneItems.removeAll(static_cast<RadioStation*>(sceneItems.at(i))->getRadioVisibility());
+                static_cast<RadioStation*>(sceneItems.at(i))->deleteRS();
+            }
+        }
+    }
 
 }
-}
+
 
 /**
  * @brief MainWindow::tuneUI Настраивает окно
@@ -142,12 +159,12 @@ void MainWindow::tuneUI()
    ui->interactiveGraphicsWindow->setRenderHint(QPainter::Antialiasing);
    ui->interactiveGraphicsWindow->setCacheMode(QGraphicsView::CacheBackground);
    ui->interactiveGraphicsWindow->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-   ui->interactiveGraphicsWindow->setContextMenuPolicy(Qt::CustomContextMenu);
-   mainScene->setSceneRect(0,0,500,500);
+   mainScene->setSceneRect(0,0,SCENE_RECT_WIDTH,SCENE_RECT_HEIGHT);
 
    /// создается контекстное меню
    menuMW = new QMenu(ui->interactiveGraphicsWindow);
    actNew = new QAction("Добавить станцию", ui->interactiveGraphicsWindow);
+
    menuMW->addAction(actNew);
 
 }
@@ -162,7 +179,7 @@ void MainWindow::showAdditionalInfo(QString info, bool rewrite){
     }
     else
     {
-        lblInfo->setText(lblInfo->text() + " "+ info);
+        lblInfo->setText(lblInfo->text() + " " + info);
     }
 }
 

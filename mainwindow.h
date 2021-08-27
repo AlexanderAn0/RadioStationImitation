@@ -14,6 +14,7 @@
 #include <QLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QContextMenuEvent>
 
 #include <radiostation.h>
 #include <radiovisibility.h>
@@ -22,6 +23,8 @@
 #define MAX_RAD_ROW MIN_RAD_ROW
 #define MIN_RAD_COLUMN 1
 #define MAX_RAD_COLUMN 2
+#define SCENE_RECT_WIDTH 500
+#define SCENE_RECT_HEIGHT 500
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,11 +38,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 protected:
-
+    virtual void contextMenuEvent(QContextMenuEvent *event);
 private slots:
 
     void updateGraphicsItemLinks();
-    void slotCustomMenuRequested(QPoint pos);
     void on_btnAddStation_clicked();
     void on_cbxRandomRadius_stateChanged(int arg1);
     void on_btnDeleteAllStations_clicked();
@@ -50,6 +52,7 @@ private:
     QGraphicsScene *mainScene;
     /// Действие для создания объекта и контекстное меню для этого действия
     QAction * actNew;
+
     QMenu *menuMW;
     /// точка, куда в последний раз нажималась ПКМ
     QPoint lastRightclickPos;
@@ -63,5 +66,6 @@ private:
 
     /// последние верно введенные минимальный и максимальный радиусы радиовидимости
     int minRad, maxRad;
+
 };
 #endif // MAINWINDOW_H

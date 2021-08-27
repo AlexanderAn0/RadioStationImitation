@@ -35,6 +35,9 @@ public:
         RS = 65537,
         RV = 65538
      };
+
+protected:
+    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 private:
 
     QRectF boundingRect() const;
@@ -51,6 +54,7 @@ private:
 
     /// вектор связей для отрисовки
     QVector <RadioStation * > links;
+
     /// контекстное меню и действие для удаления
     QAction *actDel;
     QMenu *menuRadioStation;
