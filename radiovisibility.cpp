@@ -21,7 +21,6 @@ void RadioVisibility::drawlines(QVector<QGraphicsItem*> links){
         vecLinks.clear();
 
     vecLinks = links;
-
 }
 /**
  * @brief RadioVisibility::type виртуальная функция QGraphicsItem, показывает тип элемента
@@ -58,13 +57,12 @@ void RadioVisibility::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     /// перенастройка пера и отрисовка линий связи к объектам, которые передала станция
     dashLinePen.setColor(Qt::red);
     painter->setPen(dashLinePen);
-    for(int i=0; i<vecLinks.count();++i){
+   for(int i=0; i<vecLinks.count();++i){
         painter->drawLine(mapFromScene(this->pos()),
                           mapFromScene(vecLinks.at(i)->pos()));
 
 
     }
-
     Q_UNUSED(option);
     Q_UNUSED(widget);
 

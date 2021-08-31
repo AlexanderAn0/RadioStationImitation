@@ -39,8 +39,8 @@ void RadioStation::updateLinks(){
     collItems = myRadV->collidingItems(Qt::IntersectsItemShape);
 
     /// Если пересекается не только с собственной станцией, проверяет станция ли это и добавляет его в
-    /// вектор линий связи
-    if(collItems.count() > 2)
+    /// вектор линий связи, если пересекается только с собой или чужой радиовидимостью, то очищает связи
+    if(collItems.count() > OWN_STATION_AND_VISIBILITY)
     {
         for(int i =0; i<collItems.count(); ++i){
             if(collItems.at(i)->type() == RS)
@@ -48,15 +48,22 @@ void RadioStation::updateLinks(){
                 addLink(static_cast<RadioStation*>(collItems.at(i)));
             }
         }
-    }
 
-    /// Проверяет, есть ли в векторе связей лишние станции, с которыми уже нет контакта и удаляет их
-    for(int i=0; i<links.count(); ++i)
-    {
-        if(!collItems.contains(static_cast<QGraphicsItem*>(links.at(i))))
+        /// Проверяет, есть ли в векторе связей лишние станции, с которыми уже нет контакта и удаляет их
+
+        for(int i=0; i<links.count(); ++i)
         {
-            links.removeAll(links.at(i));
+
+            if(!collItems.contains(static_cast<QGraphicsItem*>(links.at(i))))
+            {
+                links.removeAll(links.at(i));
+            }
         }
+
+    }
+    else
+    {
+        links.clear();
     }
 
     /// Перевод вектора радиостанций в вектор графических объектов и отправка его радиовидимости для отрисовки линии связи
@@ -102,6 +109,7 @@ int RadioStation::getCoverageRadius(){
 void RadioStation::drawLink(RadioStation *RS){
     links.append(RS);
 }
+
 
 /**
  * @brief RadioStation::getRadioVisibility возвращает радиовидимость этой станции

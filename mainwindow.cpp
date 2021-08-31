@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
  */
 MainWindow::~MainWindow()
 {
+    on_btnDeleteAllStations_clicked();
     delete lblInfo;
     delete actNew;
     delete menuMW;
@@ -118,23 +119,29 @@ void MainWindow::on_cbxRandomRadius_stateChanged(int presset)
  */
 void MainWindow::on_btnDeleteAllStations_clicked()
 {
-    ///!!! при удалении разом 65+ объектов ошибка сегментации, т.к. у еще не удаленных идет обращение к
-    /// удаленным объектам в RadioVisibility::vecLinks.at(i).pos() или в RadioStation::Links.at(i)
 
     QList<QGraphicsItem*> sceneItems = mainScene->items();
 
-    /// находит среди объектов радиостанции и удаляет их, отдельно убирая их радиовидимость из себя
+    /// Убираем все станции со сцены
+    for (int i=0;i<sceneItems.count() ;++i )
+    {
+        mainScene->removeItem(sceneItems.at(i));
+    }
+    /// Выделяем из списка объектов радиостанции и убираем ее радиовидимость из массива, чтобы после с ней не столкнуться
+    /// и удаляем станцию
     for (int i=0;i<sceneItems.count() ;++i ) {
         {
-            mainScene->removeItem(sceneItems.at(i));
             if(sceneItems.at(i)->type()== RadioStation::RS){
-                sceneItems.removeAll(static_cast<RadioStation*>(sceneItems.at(i))->getRadioVisibility());
-                static_cast<RadioStation*>(sceneItems.at(i))->deleteRS();
+                RadioStation * stationForDelete = static_cast<RadioStation*>(sceneItems.at(i));
+                sceneItems.removeOne(stationForDelete->getRadioVisibility());
+                stationForDelete->deleteRS();
+
             }
         }
     }
 
 }
+
 
 
 /**

@@ -17,6 +17,7 @@
 #include "radiovisibility.h"
 #define SHIFT_FOR_CENTERING 4
 #define STATION_CIRCLE_RADIUS 20
+#define OWN_STATION_AND_VISIBILITY 2
 class RadioStation : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -35,7 +36,6 @@ public:
         RS = 65537,
         RV = 65538
      };
-
 protected:
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 private:
